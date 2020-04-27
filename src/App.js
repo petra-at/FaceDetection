@@ -51,6 +51,7 @@ class App extends Component {
     const width = Number(image.width);
     const height = Number(image.height);
     console.log('h,w =',height,width);
+    
     return {
       topRow: face.top_row* height,
       leftCol: face.left_col * width,
