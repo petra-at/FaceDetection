@@ -47,13 +47,14 @@ class App extends Component {
   calculateFaceLocation=(data)=>{
     const face = data.outputs[0].data.regions[0].region_info.bounding_box;
     console.log('face = ',face);
+
     const image = document.getElementById('inputImage');
     const width = Number(image.width);
     const height = Number(image.height);
     console.log('h,w =',height,width);
-    
+
     return {
-      topRow: face.top_row* height,
+      topRow: face.top_row * height,
       leftCol: face.left_col * width,
       bottomRow: height - (face.bottom_row * height),
       rightCol: width - (face.right_col * width)
