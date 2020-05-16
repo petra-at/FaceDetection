@@ -31,10 +31,12 @@ const particleOptions={
   }
 }
 
+
 class App extends Component {
   constructor()
   {
     super();
+
     this.state ={
       input:'',
       imageURL:'',
@@ -51,7 +53,7 @@ class App extends Component {
     const image = document.getElementById('inputImage');
     const width = Number(image.width);
     const height = Number(image.height);
-    console.log('h,w =',height,width);
+    
 
     return {
       topRow: face.top_row * height,
@@ -62,7 +64,7 @@ class App extends Component {
   }
 
   displayFaceBox =(box)=>{
-    console.log('adjusted face',box);
+    
     this.setState({box:box})
   }
 
