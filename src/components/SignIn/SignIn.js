@@ -53,7 +53,8 @@ render(){
                     className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                     type="email" 
                     name="email-address" 
-                    id="email-address"/>
+                    id="email-address"
+                    />
                 </div>
                 <div className="mv3">
                     <label className="db fw6 lh-copy f6" htmlFor="password">Password</label>
@@ -62,7 +63,8 @@ render(){
                     className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" 
                     type="password" 
                     name="password"  
-                    id="password"/>
+                    id="password"
+                    />
                 </div>
                 
                 </fieldset>
@@ -73,9 +75,7 @@ render(){
                  value="Sign in"
                  onClick = {this.onSubmitSignIn} />
                 </div>
-                <div className="lh-copy mt3">
-                <label style={{cursor:'pointer'}} className="f6 link dim black db" onClick ={()=>this.props.onRouteChange('register')} >Register</label>
-                </div>
+                
             </div>
             </main>
             </article>
