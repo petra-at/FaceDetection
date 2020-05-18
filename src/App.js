@@ -101,7 +101,7 @@ const initialState = {
        
           if(this.state.input)
           {
-            fetch('http://localhost:3002/imageurl',{
+            fetch('https://face-detectionclarifai.herokuapp.com/imageurl',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({
@@ -111,7 +111,7 @@ const initialState = {
             .then(response => {
                 if(response)
                 {
-                    fetch('http://localhost:3002/image',{
+                    fetch('https://face-detectionclarifai.herokuapp.com/image',{
                         method:'PUT',
                         headers:{'Content-Type':'application/json'},
                         body:JSON.stringify({
