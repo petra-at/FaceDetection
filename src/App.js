@@ -47,7 +47,7 @@ const initialState = {
     }
 }
 
-class App extends Component {
+ class App extends Component {
     constructor()
     {
       super();
