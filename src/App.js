@@ -31,100 +31,148 @@ const particleOptions={
   }
 }
 
+const initialState = {
+    input:'',
+    imageURL:'',
+    box:{},
+    route:'signin',
+    signedIn:false,
+    user:{
+        id:'',
+        name:'',
+        email:'',
+        entries:0,
+        joined:''
+
+    }
+}
 
 class App extends Component {
-  constructor()
-  {
-    super();
-
-    this.state ={
-      input:'',
-      imageURL:'',
-      box:{},
-      route:'signin',
-      signedIn:false
-    }
-  }
-
-  calculateFaceLocation=(data)=>{
-    const face = data.outputs[0].data.regions[0].region_info.bounding_box;
-    console.log('face = ',face);
-
-    const image = document.getElementById('inputImage');
-    const width = Number(image.width);
-    const height = Number(image.height);
-    
-
-    return {
-      topRow: face.top_row * height,
-      leftCol: face.left_col * width,
-      bottomRow: height - (face.bottom_row * height),
-      rightCol: width - (face.right_col * width)
-    }
-  }
-
-  displayFaceBox =(box)=>{
-    
-    this.setState({box:box})
-  }
-
-    onInputChange =(event)=>{
-      this.setState({input:event.target.value});
-    }
-
-    onSubmit = ()=>
+    constructor()
     {
-      this.setState({imageURL: this.state.input});
-   
-      if(this.state.input)
-      {
-        app.models.predict(
-        Clarifai.FACE_DETECT_MODEL, 
-        this.state.input)
-        .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
-        .catch(err=>console.log("Error: ",err));
+      super();
+      this.state ={
+        input:'',
+        imageURL:'',
+        box:{},
+        route:'signin',
+        signedIn:false,
+        user:{
+            id:'',
+            name:'',
+            email:'',
+            entries:0,
+            joined:''
+
+        }
       }
     }
 
-    onRouteChange = (route)=>{
-      this.setState({route:route }); 
-      if(route==='signin'){
-        this.setState({signedIn:false}); 
-      }
-      else if(route==='home')
-      {
-        this.setState({signedIn:true}); 
-      }
+    loadUser=(data)=>{
+        this.setState({
+            user:{
+                id:data.id,
+                name:data.username,
+                email:data.email,
+                entries:data.entries,
+                joined:data.joined
+            }
+        })
     }
 
-  render(){
-  
-  return (
-    <div className="App">
-      <Particles className='particles' params={particleOptions}/>
-      <Navigation onRouteChange={this.onRouteChange} signIn={this.state.signedIn}/>
-  {
+    calculateFaceLocation=(data)=>{
+        const face = data.outputs[0].data.regions[0].region_info.bounding_box;    
+        const image = document.getElementById('inputImage');
+        const width = Number(image.width);
+        const height = Number(image.height);
+
+        return {
+          topRow: face.top_row * height,
+          leftCol: face.left_col * width,
+          bottomRow: height - (face.bottom_row * height),
+          rightCol: width - (face.right_col * width)
+        }
+      }
     
-    this.state.route ==='home' ?
-    <div>
-          <Logo /> 
-          <Rank/>
-          <ImageLinkForm 
-            onInputChange = {(this.onInputChange)} 
-            onButtonSubmit={this.onSubmit}
-          /> 
-          <FaceRecognition box={this.state.box} imageURL={this.state.imageURL}/> 
-    </div>
-    :(
-      this.state.route === 'signin'
-      ? <SignIn onRouteChange={this.onRouteChange}/> 
-      : <Register onRouteChange={this.onRouteChange}/>
-    )
-    }  
-  
-    </div>
-  );
-}
-}
-
-export default App;
+      displayFaceBox =(box)=>{
+        this.setState({box:box})
+      }
+    
+    onInputChange =(event)=>{
+          this.setState({input:event.target.value});
+      }
+    
+    onSubmit = ()=>
+        {
+          this.setState({imageURL: this.state.input});
+       
+          if(this.state.input)
+          {
+            app.models.predict(
+            Clarifai.FACE_DETECT_MODEL, 
+            this.state.input)
+            .then(response => {
+                if(response)
+                {
+                    fetch('http://localhost:3002/image',{
+                        method:'PUT',
+                        headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({
+                            id:this.state.user.id
+                        })
+                    })
+                    .then(response=>response.json())
+                    .then(count=>{
+                        this.setState(Object.assign(this.state.user,{entries:count}))
+                    })
+                    .catch(err=>console.log(err)); 
+                }
+                this.displayFaceBox(this.calculateFaceLocation(response))
+            })
+            .catch(err=>console.log("Error: ",err));
+          }
+      }
+    
+    
+    onRouteChange = (route)=>{
+          if(route==='signin'){
+            this.setState(initialState); // when back out sign out clear state
+          }
+          else if(route==='home')
+          {
+            this.setState({signedIn:true}); 
+          }
+          this.setState({route:route}); 
+      }
+    
+      render(){
+       
+      return (
+        <div className="App">
+          <Particles className='particles' params={particleOptions}/>
+          <Navigation onRouteChange={this.onRouteChange} signIn={this.state.signedIn}/>
+      {
+        
+        this.state.route ==='home' ?
+        <div>
+              <Logo  /> 
+              <Rank name={this.state.user.name} entries={this.state.user.entries}/>
+              <ImageLinkForm 
+                onInputChange = {(this.onInputChange)} 
+                onButtonSubmit={this.onSubmit}
+              /> 
+              <FaceRecognition box={this.state.box} imageURL={this.state.imageURL}/> 
+        </div>
+        :(
+          this.state.route === 'signin'
+          ? <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange}/> 
+          : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+        )
+        }  
+      
+        </div>
+      );
+    }
+    }
+    
+    export default App;
